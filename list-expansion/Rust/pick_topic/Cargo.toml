@@ -1,0 +1,7 @@
+[package]
+name = "pick_topic"
+version = "0.1.0"
+authors = ["Ian Harris <ian+gh@dgby.org>"]
+
+[dependencies]
+rand = "0.3"
