@@ -12,11 +12,16 @@ import Testing
 testLastDigit :: (Integer, Integer) -> Bool
 testLastDigit (n, d) = lastDigit n == d
 
+testLastDigit' :: (Integer, Integer) -> Bool
+testLastDigit' (n, d) = lastDigit' n == d
+
 testDropLastDigit :: (Integer, Integer) -> Bool
 testDropLastDigit (n, d) = dropLastDigit n == d
 
 ex1Tests :: [Test]
 ex1Tests = [ Test "lastDigit test" testLastDigit
+             [(123, 3), (1234, 4), (5, 5), (10, 0), (0, 0)]
+           , Test "lastDigit' test" testLastDigit'
              [(123, 3), (1234, 4), (5, 5), (10, 0), (0, 0)]
            , Test "dropLastDigit test" testDropLastDigit
              [(123, 12), (1234, 123), (5, 0), (10, 1), (0,0)]
@@ -70,13 +75,25 @@ ex3Tests = [ Test "doubleEveryOther test" testDoubleEveryOther
 
 -- Exercise 4 -----------------------------------------
 
+testSumDigits :: ([Integer], Integer) -> Bool
+testSumDigits (n, d) = sumDigits n == d
+
 ex4Tests :: [Test]
-ex4Tests = [Test "undefined ex4 test" (\_ -> False) [0]]
+ex4Tests = [Test "sumDigits test" testSumDigits
+            [([10,5,18,4], 19), ([0,0,0,0], 0)]
+           ]
 
 -- Exercise 5 -----------------------------------------
 
+testLuhn :: (Integer, Bool) -> Bool
+testLuhn (n, d) = luhn n == d
+
 ex5Tests :: [Test]
-ex5Tests = [Test "undefined ex5 test" (\_ -> False) [0]]
+ex5Tests = [Test "luhn test" testLuhn
+            [(1234567898765432, False), (5594589764218858, True),
+             (4716073966069837, True), (5206524606365518, True),
+             (6011322460222310, True), (348885883009883, True)]
+           ]
 
 -- Exercise 6 -----------------------------------------
 

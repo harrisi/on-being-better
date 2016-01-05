@@ -124,3 +124,54 @@ added a call to `toInteger` with `digitToInt`
 I think the above is still a useful piece of information, so I will
 keep it how it is.
 --}
+
+luhn :: Integer -> Bool
+luhn = (== 0) . (`mod` 10) . sumDigits . doubleEveryOther . toRevDigits
+
+type Peg = String
+type Move = (Peg, Peg)
+
+hanoi :: Integer -> Peg -> Peg -> Peg -> [Move]
+hanoi n src goal tmp
+  | n <= 0 = [] -- No disks, no moves
+  | n == 1 = [(src, goal)] -- One disk, can be accomplished in one move
+  | otherwise = hanoi (n - 1) src tmp goal ++
+                hanoi 1 src goal tmp ++
+                hanoi (n - 1) tmp goal src
+
+{--
+From paper:
+"To move n discs (stacked in increasing size) from peg a to peg c using peg b
+as termporary storage,
+1. move n - 1 discs from a to b using c as temporary storage
+2. move the top disc from a to c
+3. move n - 1 discs from b to c using a as temporary storage."
+
+Let's look at what happens in the above implementation
+hanoi 3 "a" "b" "c"
+-->
+hanoi 2 "a" "c" "b" ++
+hanoi 1 "a" "b" "c" ++
+hanoi 2 "c" "b" "a"
+-->
+hanoi 1 "a" "b" "c" ++
+[("a", "c")] ++
+hanoi 1 "b" "c" "a" ++
+[("a", "b")] ++
+hanoi 1 "c" "a" "b" ++
+[("c", "b")] ++
+hanoi 1 "a" "b" "c"
+-->
+[("a", "b")] ++
+[("a", "c")] ++
+[("b", "c")] ++
+[("a", "b")] ++
+[("c", "a")] ++
+[("c", "b")] ++
+[("a", "b")]
+-->
+[("a", "b"), ("a", "c"), ("b", "c"), ("a", "b"), ("c", "a"), ("c", "b"),
+ ("a", "b")]
+
+I still have some trouble understanding this algorithm.
+--}
