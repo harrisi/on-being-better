@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link rel="stylesheet" href="file:///home/ian/.emacs.d/customizations/github-pandoc.css">
+</head>
+<body>
+<h1 id="functional-programming-is-awesome">Functional Programming is Awesome</h1>
+<p>I have had a moment of clarity. I have experienced the value and power of higher-order functions to my current max potential. I have written an exciting and elegant function in Haskell.</p>
+<p>(The code this article is about can be found <a href="../../Haskell/cis194/02/HW02.hs">here</a>.)</p>
+<h2 id="haskell-is-awesome">Haskell is Awesome</h2>
+<p>I have been spending a lot of time recently learning Haskell. It is quickly becoming my most loved language - although it's not a very fair game: I haven't really done any actual programming in anything in awhile. (The closest I've come to actually &quot;programming&quot; recently is in OCaml struggling through a MOOC.) Nonetheless, I'm very excited. I really do think I just wrote a function that shows a wonderful example of how I'm &quot;thinking functionally,&quot; something I never understood literally five minutes before writing this. I'm beginning to see the light in all it's glory.</p>
+<h2 id="show-me-the-code">Show Me the Code!</h2>
+<p>Alright, I've now hyped this up like crazy, but I assure you it's very exciting. You're probably thinking that it's an expertly crafted, multi-line, applicative-functor-monad-monoid-type-theory-something beast of a function that's production ready and will solve the world's problems. People shall look upon it for decades, studying the intricacies and meaning behind every expertly placed function, operator, definition, and typeclass involved. Well, here it is:</p>
+<pre><code>countColors&#39; :: Code -&gt; [Int]
+countColors&#39; c = zipWith exactMatches&#39; (cycle [c]) $ map repeat [minBound ..]</code></pre>
+<p><strong><em>AMAZING!</em></strong></p>
+<p>Right?..</p>
+<h3 id="meh..">Meh..</h3>
+<p>Look, I know. Maybe it's not what you expected. Maybe you can already write functions like that in your sleep. Well, good. I hope that you can then appreciate how nice this function is. But for me, this is a whole new world. This is the story of how I, Ian Harris, wrote a function.</p>
+<h2 id="iterative-and-functional-thinking">Iterative and Functional Thinking</h2>
+<p>So some may see this and think &quot;big woop, it's a simple definition.&quot; But not me. Well, not me from fifteen minutes ago. The current me does say &quot;big woop, it's a simple definition,&quot; and that's why I'm so excited by it.</p>
+<p>This definition of <code>countColors'</code> is nothing special to a veteran Haskeller or even anyone who has done any programming in a functional style. But this is the kind of definition that shows why functional programming is so powerful. I'm not trying to be arrogant in that claim - it really is! Look at how <a href="http://http://learnyouahaskell.com/">Learn You A Haskell For Great Good!</a> gives examples of <code>zipWith</code>:</p>
+<pre><code>ghci&gt; zipWith&#39; (+) [4,2,5,6] [2,6,2,3]
+[6,8,7,9]
+ghci&gt; zipWith&#39; max [6,3,2,1] [7,3,1,5]
+[7,3,2,5]
+ghci&gt; zipWith&#39; (++) [&quot;foo &quot;, &quot;bar &quot;, &quot;baz &quot;] [&quot;fighters&quot;, &quot;hoppers&quot;, &quot;aldrin&quot;]
+[&quot;foo fighters&quot;,&quot;bar hoppers&quot;,&quot;baz aldrin&quot;]
+ghci&gt; zipWith&#39; (*) (replicate 5 2) [1..]
+[2,4,6,8,10]
+ghci&gt; zipWith&#39; (zipWith&#39; (*)) [[1,2,3],[3,5,6],[2,3,4]] [[3,2,2],[3,4,5],[5,4,3]]
+[[3,4,6],[9,20,30],[10,12,12]]</code></pre>
+<p>(From <a href="http://learnyouahaskell.com/higher-order-functions" class="uri">http://learnyouahaskell.com/higher-order-functions</a>; In these examples the author is using their own definition of <code>zipWith</code>, <code>zipwith'</code>, but it's irrelevant here.)</p>
+<p>Now why is this interesting? Well, I read this book (mostly - the last couple chapters were too confusing and not helpful enough for me to consume them at the time) and saw these examples and typed them into GHCi and then that was it. I didn't immediately learn anything, I didn't suddenly see why it was a useful function and apply changes to my code, and I certainly didn't write a terribly written essay at two in the morning. But look above! I used <code>zipWith</code>! And, as you'll now see, it was useful!</p>
+<h3 id="learning-and-improving-from-oneself">Learning and Improving from Oneself</h3>
+<p>This is the true heart of why I believe I've truly written a masterful definition. Here's a secret: the exciting definition is <code>countColors'</code> (note the prime), and not <code>countColors</code>. There does exist a definition <code>countColors</code> in the same module, only a few lines above <code>countColors'</code>, but it is not as interesting as a definition by itself. (The use of <code>exactMatches'</code> is a similar case, but it's not as exciting as <code>countColors'</code>.)</p>
+<p>Here is <code>countColors</code>:</p>
+<pre><code>countColors :: Code -&gt; [Int]
+countColors a = let reds = exactMatches&#39; a (repeat Red)
+                    greens = exactMatches&#39; a (repeat Green)
+                    blues = exactMatches&#39; a (repeat Blue)
+                    yellows = exactMatches&#39; a (repeat Yellow)
+                    oranges = exactMatches&#39; a (repeat Orange)
+                    purples = exactMatches&#39; a (repeat Purple)
+                in
+                  [reds, greens, blues, yellows, oranges, purples]</code></pre>
+<p>Ech! No thank you, <code>countColors</code>, take me back to <code>countColors'</code>!</p>
+<p>So why am I still excited? Well, because created a working defintion to solve a problem and then I <em>immediately</em> recognized that it wasn't an ideal solution (repeating myself six times), saw what piece(s) had to be abstracted out (<code>exactMatches' a (repeat _)</code>), and was able to think of a better, more general, future-prepared, functional definition. And I'm not a math wizard or anything!</p>
+<p>I was familiar with <code>zip</code>, saw that I was essentially zipping two lists together (<code>Code</code> is defined as <code>type Code = [Peg]</code>) with the function I wrote, <code>exactMatches'</code> to get a list of values. I almost spelled out the type signature for <code>zipWith</code> in my head, so I gave it a shot. After a bit of messing around in GHCi, I was able to get all the types to line up, and to my enjoyment, it worked exactly as <code>countColors</code> worked, only much nicer!</p>
+<p>What is so nice about <code>countColors'</code>, anyway? Well, 30-minutes-ago Me probably wouldn't really &quot;get&quot; it. But the new and improved Me does! There are a few things, as far as I'm concerned.</p>
+<ol>
+<li>It's much more concise code. This is pleasant because it's exactly the same functionality while being much less repetitive and long.</li>
+<li>It's more &quot;future-ready.&quot; Defining <code>countColors'</code> actually required me to change the definition of <code>Peg</code>. I wanted the extremely nice (in my opinion) way of expressing &quot;a finite list of infinite lists, each of which contain exactly one of every value of type <code>Peg</code> in order.&quot; That simply boils down to <code>[minBound ..]</code> in Haskell, which is awesome. This means I can change the order of the values of <code>Peg</code>s definition or add new constructors and <code>countColors'</code> will still work just fine and, more impressively, give <em>meaningful</em> results with no changes to the definition. That means that what's important is changing the shape of the data itself, not the definition of functions that operate it, and that to me is beautiful. The coolest thing about this is all I had to do was add two more typeclasses (<code>Enum</code> and <code>Bounded</code>) to the defintion of <code>Peg</code> - <em>that's it</em></li>
+<li>It's probably more efficient. I don't actually know this, but my naive assumption is that it is more efficient.</li>
+<li>It's pretty freaking sweet.</li>
+</ol>
+<h3 id="conclusion">Conclusion</h3>
+<p>I have now been smashing on my keyboard for about an hour just to write to myself (but I like to pretend someone might read this). Why waste my time writing all this? Because how I got here <em>isn't magic</em>. I didn't read a bunch of textbooks and research papers and deeply think about every word that Simon Peyton Jones wrote in the past 30 years. I got to this exciting defintion simply by writing a naive first approach, <strong>wrote a comment describing how the function worked</strong>, and immediately saw a solution come out of plain English. For me, the important part seems to be writing the plain English definition of what a function does.</p>
+<p>The interesting part to me is that I really did just compose functions to get the definition of <code>countColors'</code>. The definition is six functions (not exactly correct due to sugar and all, but it's a close enough description to be useful for me) interacting with one parameter passed to the function. That's what (I think) people talk about when they talk about the beauty and importance of higher-order functions. It's the first time I've ever written a definition I was really satisfied with, and that's exciting.</p>
+<p>In summary, functional programming is a very exciting way to program. Having the moment internally of &quot;oh, wait. I know what that pattern is! I can use <em>x</em>!&quot; (<em>x</em> in this case was <code>zipWith</code>) is thrilling and thought-provoking. I wanted to shout to the world &quot;Look! I did it! I wrote a function definition! And it's cool!&quot; But it's late and cold outside, so I wrote this blog post for nobody instead.</p>
+<p>For future me: Continue to enjoy these moments, and continue to struggle. The payoff of realizing you've created something <em>good</em> is outstanding and, most importantly, <em>in reach</em>.</p>
+</body>
+</html>
