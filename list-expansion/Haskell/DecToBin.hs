@@ -1,4 +1,4 @@
-module DecToBin where
+module DecToBin (decToBin) where
 
 decToBin':: Int -> [Int] -> [Int]
 decToBin' n b
