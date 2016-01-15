@@ -14,3 +14,5 @@ I should have some hook/daemon/something that identifies duplicates.
 
 Functional implementations of various things.
 Things like "Baby's First Garbage Collector" (http://journal.stuffwithstuff.com/2013/12/08/babys-first-garbage-collector/) and other examples that mostly are written in an imperative style. It could be a series of examples written in different languages, both ones that embrace the functional style and those that aren't typically thought of as functional languages (Java, C#, even C?).
+
+Ian is riding a taste sensation.
