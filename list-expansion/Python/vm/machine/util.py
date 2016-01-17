@@ -8,6 +8,14 @@ def getValFromBits(bits):
 
 def operatorToFunction(op): # [list of four elements in {0, 1}]
     opVal = sum([a * b for (a, b) in zip(op, [8, 4, 2, 1])])
-    if not(0x1 <= opVal <= 0xF):
+    if not(0x1 <= opVal <= 0xD):
         sys.exit('operator doesn\'t exist')
     return opVal
+
+def readFromFile(loc):
+    res = []
+    with open(loc, 'r') as f:
+        for line in f:
+            res.append(line.replace("\n", "")[:2])
+            res.append(line.replace("\n", "")[2:])
+    return res

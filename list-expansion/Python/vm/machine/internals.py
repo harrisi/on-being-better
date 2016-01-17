@@ -1,13 +1,21 @@
 import sys
 from machine import util
+import collections
 
 # registers 0-F
 registers = {x: 0 for x in range(0xF + 1)}
 # memory cells 0-255
 memory = {x: 0 for x in range(2 ** 8)}
+ControlUnit = collections.namedtuple('ControlUnit',
+                                     ['operator', 'operand'])
+controlunit = (None, None)
 
+# Program counter
+# Is set to the location in memory the program is currently at
 PC = 0x0
-SP = 0x0
+# Instruction register
+# is set to the full 16-bit instruction to be executed by the CPU
+IR = 0x0
 
 # XXX
 def LOAD1(operands): # 12 bits as list
@@ -82,8 +90,7 @@ def JUMP(operands):
         PC = util.getValFromBits(XY)
 
 def HALT(operands): # operands unused
-    print('HALT')
-    sys.exit()
+    sys.exit('HALT')
 
 # meta function (not part of Appendix C's machine)
 def PRINT(operands):
@@ -107,6 +114,13 @@ opDict = {0x1: LOAD1, # LOAD R XY (contents)
           0xA: ROTATE,
           0xB: JUMP,
           0xC: HALT,
-          0xD: None,
+          0xD: PRINT,
           0xE: None,
-          0xF: PRINT}
+          0xF: None}
+
+def storeProgramInMemory(loc):
+    instructions = util.readFromFile(loc)
+    i = 0
+    for instruction in instructions:
+        memory[PC + i] = instruction
+        i += 1
