@@ -1,3 +1,4 @@
 list-expansion/Rust/**/target/
 list-expansion/Elm/**/elm-stuff/
 list-expansion/Python/**/*.pyc
+list-expansion/Idris/**/*.ibc
