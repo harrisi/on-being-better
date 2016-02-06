@@ -6,6 +6,8 @@ module Calc where
 import ExprT
 import Parser
 import qualified StackVM as VM
+import qualified Data.Map as M
+import Control.Applicative ((<*>), (<$>))
 
 eval :: ExprT -> Integer
 eval (Lit n) = n
@@ -78,3 +80,32 @@ instance Expr VM.Program where
 compile :: String -> Maybe VM.Program
 compile = parseExp lit add mul
 
+class HasVars a where
+  var :: String -> a
+
+data VarExprT = L Integer
+              | A VarExprT VarExprT
+              | M VarExprT VarExprT
+              | V String
+              deriving (Show, Eq)
+
+instance Expr VarExprT where
+  lit = L
+  add = A
+  mul = M
+
+instance HasVars VarExprT where
+  var = V
+
+instance HasVars (M.Map String Integer -> Maybe Integer) where
+  var s = M.lookup s
+
+instance Expr (M.Map String Integer -> Maybe Integer) where
+  lit n = \_ -> Just n
+  add n m = \v -> (+) <$> n v <*> m v
+  mul n m = \v -> (*) <$> n v <*> m v
+
+withVars :: [(String, Integer)]
+         -> (M.Map String Integer -> Maybe Integer)
+         -> Maybe Integer
+withVars vs exp = exp $ M.fromList vs
