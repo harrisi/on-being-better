@@ -24,7 +24,6 @@ import Course.Id
 import Course.List
 import Course.Optional
 import qualified Prelude as P(fmap, return, (>>=))
-
 -- | All instances of the `Applicative` type-class must satisfy three laws.
 -- These laws are not checked by the compiler. These laws are given as:
 --
@@ -61,8 +60,7 @@ infixl 4 <*>
   (a -> b)
   -> f a
   -> f b
-(<$>) =
-  error "todo: Course.Applicative#(<$>)"
+(<$>) = (<*>) . pure
 
 -- | Insert into Id.
 --
@@ -74,14 +72,13 @@ instance Applicative Id where
   pure ::
     a
     -> Id a
-  pure =
-    error "todo: Course.Applicative pure#instance Id"
+  pure = Id
   (<*>) :: 
     Id (a -> b)
     -> Id a
     -> Id b
-  (<*>) =
-    error "todo: Course.Applicative (<*>)#instance Id"
+  -- f <*> i = mapId (runId f) i
+  (Id f) <*> (Id a) = Id $ f a
 
 -- | Insert into a List.
 --
@@ -93,14 +90,13 @@ instance Applicative List where
   pure ::
     a
     -> List a
-  pure =
-    error "todo: Course.Applicative pure#instance List"
+  pure = (:. Nil)
+
   (<*>) ::
     List (a -> b)
     -> List a
     -> List b
-  (<*>) =
-    error "todo: Course.Apply (<*>)#instance List"
+  f <*> a = flatMap (`map` a) f
 
 -- | Insert into an Optional.
 --
@@ -118,14 +114,31 @@ instance Applicative Optional where
   pure ::
     a
     -> Optional a
-  pure =
-    error "todo: Course.Applicative pure#instance Optional"
+  pure = Full
   (<*>) ::
     Optional (a -> b)
     -> Optional a
     -> Optional b
-  (<*>) =
-    error "todo: Course.Apply (<*>)#instance Optional"
+  -- Empty <*> _ = Empty
+  -- _ <*> Empty = Empty
+  -- (Full f) <*> (Full a) = Full $ f a
+  f <*> a = bindOptional (`mapOptional` a) f
+  {--
+FFM:
+  bindOptional :: (a -> Optional b) -> Optional a -> Optional b
+  mapOptional :: (a -> b) -> Optional a -> Optional b
+  [`a` is Optional a]
+  (`mapOptional` a) :: (a -> b) -> Optional b
+  [`f` is Optional (a -> b)]
+  bindOptional (`mapOptional` a) f ::
+  bindOptional <(a -> b) -> Optional b> f
+  bindOptional <(a -> b) -> Optional b> <Optional (a -> b)>
+  (`mapOptional` a) (a -> b)
+  (a -> b) `mapOptional` a
+  [or]
+  mapOptional (a -> b) Optional a ( returns Optional b )
+--}
+  
 
 -- | Insert into a constant function.
 --
@@ -149,14 +162,12 @@ instance Applicative ((->) t) where
   pure ::
     a
     -> ((->) t a)
-  pure =
-    error "todo: Course.Applicative pure#((->) t)"
+  pure = const
   (<*>) ::
     ((->) t (a -> b))
     -> ((->) t a)
     -> ((->) t b)
-  (<*>) =
-    error "todo: Course.Apply (<*>)#instance ((->) t)"
+  f <*> g = \t -> f t $ g t
 
 
 -- | Apply a binary function in the environment.
@@ -184,8 +195,22 @@ lift2 ::
   -> f a
   -> f b
   -> f c
-lift2 =
-  error "todo: Course.Applicative#lift2"
+lift2 f a b = f <$> a <*> b
+{--
+FFM:
+  lift2 :: Applicative f => (a -> b -> c) -> f a -> f b -> f c
+  lift2 f a b = f <$> a <*> b
+  (<$>) :: Functor f => (a -> b) -> f a -> f b
+  (<*>) :: Applicative f => f (a -> b) -> f a -> f b
+  lift2 <(a -> b -> c)> (f a) (f b) =
+    (<$> f a) -->
+    <$> (a -> b -> c) f a --> (::)
+    f (a -> a)
+  then apply the above new function `f (a -> a)` to the rest
+  (i.e. (<*> b))
+  f (a -> a) <*> f b = <*> f (a -> a) f b -->
+  f c
+--}
 
 -- | Apply a ternary function in the environment.
 --
@@ -216,8 +241,7 @@ lift3 ::
   -> f b
   -> f c
   -> f d
-lift3 =
-  error "todo: Course.Applicative#lift3"
+lift3 f a b c = lift2 f a b <*> c
 
 -- | Apply a quaternary function in the environment.
 --
@@ -249,8 +273,7 @@ lift4 ::
   -> f c
   -> f d
   -> f e
-lift4 =
-  error "todo: Course.Applicative#lift4"
+lift4 f a b c d = lift3 f a b c <*> d
 
 -- | Apply, discarding the value of the first argument.
 -- Pronounced, right apply.
@@ -275,8 +298,7 @@ lift4 =
   f a
   -> f b
   -> f b
-(*>) =
-  error "todo: Course.Applicative#(*>)"
+(*>) = lift2 $ const id
 
 -- | Apply, discarding the value of the second argument.
 -- Pronounced, left apply.
@@ -301,8 +323,7 @@ lift4 =
   f b
   -> f a
   -> f b
-(<*) =
-  error "todo: Course.Applicative#(<*)"
+(<*) = lift2 const
 
 -- | Sequences a list of structures to a structure of list.
 --
@@ -324,8 +345,7 @@ sequence ::
   Applicative f =>
   List (f a)
   -> f (List a)
-sequence =
-  error "todo: Course.Applicative#sequence"
+sequence = foldRight (lift2 (:.)) (pure Nil)
 
 -- | Replicate an effect a given number of times.
 --
@@ -348,8 +368,7 @@ replicateA ::
   Int
   -> f a
   -> f (List a)
-replicateA =
-  error "todo: Course.Applicative#replicateA"
+replicateA n = sequence . replicate n
 
 -- | Filter a list with a predicate that produces an effect.
 --
@@ -376,8 +395,10 @@ filtering ::
   (a -> f Bool)
   -> List a
   -> f (List a)
-filtering =
-  error "todo: Course.Applicative#filtering"
+filtering p = foldRight
+              (\a -> lift2
+                     (\b -> if b then (a :.) else id) (p a))
+              (pure Nil)
 
 -----------------------
 -- SUPPORT LIBRARIES --
@@ -395,7 +416,6 @@ return ::
   -> f a
 return =
   pure
-
 fail ::
   Applicative f =>
   Chars
@@ -410,3 +430,4 @@ fail =
   -> f b
 (>>) =
   (*>)
+
