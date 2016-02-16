@@ -95,6 +95,7 @@ Exercise 1.
 > data BlahFoo w a = BlahFoo w a deriving (Show)
 > instance (Ord w) => Functor (BlahFoo w) where
 >   fmap f (BlahFoo o a) = BlahFoo o $ f a
+<<<<<<< HEAD
 
 Exercise 2.
 
@@ -118,3 +119,5 @@ The bogus list type's instance of Functor does not obey either of the Functor la
 > -- False
 
 The above should show that L is an instance of Functor, but it is not a law-abiding Functor instance. N.b. L could absolutely be a legal instance of Functor with a slight change (the obvious one) in the definition of fmap.
+=======
+>>>>>>> 9ba7839f5324cf8b85a155fb8648f01ebbc65a79
