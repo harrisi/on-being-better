@@ -1,0 +1,12 @@
+
+./Main.hs,233
+module Main Main2,3
+f f6,7
+f f7,8
+data ExampleType ExampleType9,10
+data ExampleType = ExampleType ExampleType9,10
+instance instance11,12
+maybeMap maybeMap15,16
+maybeMap maybeMap16,17
+main main18,19
+main main19,20

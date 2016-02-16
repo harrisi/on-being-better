@@ -3,3 +3,7 @@ list-expansion/Elm/**/elm-stuff/
 list-expansion/Python/**/*.pyc
 list-expansion/Idris/**/*.ibc
 list-expansion/Erlang/**/*.beam
+list-expansion/Haskell/**/*.o
+list-expansion/Haskell/**/*.hi
+list-expansion/Haskell/**/.cabal*
+*~

@@ -111,3 +111,6 @@ ifThenElse True t _ =
   t
 ifThenElse False _ f =
   f
+
+f :: a -> Int
+f _ = 0

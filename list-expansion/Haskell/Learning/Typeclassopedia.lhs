@@ -1,5 +1,8 @@
 > module Typeclassopedia where
 > import Data.Monoid
+> import Control.Applicative
+
+Section 3 Functor
 
 Section 3.2 Instances
 
@@ -114,7 +117,46 @@ The bogus list type's instance of Functor does not obey either of the Functor la
 > fmapidL :: Bool
 > fmapidL = fmap id someL == id someL
 > -- False
+> fmapghL :: Bool
 > fmapghL = (fmap ((+1) . (*2)) someL) == (fmap (+1) . fmap (*2) $ someL)
 > -- False
 
 The above should show that L is an instance of Functor, but it is not a law-abiding Functor instance. N.b. L could absolutely be a legal instance of Functor with a slight change (the obvious one) in the definition of fmap.
+
+Section 4 Applicative
+
+Section 4.2 Laws
+
+Exercise 1.
+
+This exercise is really confusing me thus far, unfortunately.
+
+I will work on this as I continue to understand the problem.
+
+Section 4.3 Instances
+
+Exercise 1.
+
+> data MyMaybe a = None | Some a deriving (Show, Eq)
+>
+> instance Functor MyMaybe where
+>   fmap _ None = None
+>   fmap f (Some x) = Some $ f x
+>   
+> instance Applicative MyMaybe where
+>   pure = Some
+>   None <*> _ = None
+>   _ <*> None = None
+>   (Some f) <*> (Some x) = pure $ f x
+
+Exercise 2.
+
+> newtype MyZipList a = MyZipList { getMyZipList :: [a] }
+>   deriving (Show)
+>
+> instance Functor MyZipList where
+>   fmap f = MyZipList . map f . getMyZipList
+>   
+> instance Applicative MyZipList where
+>   pure = MyZipList . repeat
+>   (MyZipList xs) <*> (MyZipList ys) = MyZipList $ zipWith ($) xs ys
